@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Michael Worthington | GitHub Portfolio</title>
+    <meta
+      name="description"
+      content="A live GitHub portfolio showing repositories and recent contribution activity."
+    />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #0b1020;
+        --surface: #141b33;
+        --surface-2: #1d2746;
+        --text: #edf2ff;
+        --muted: #a8b3d4;
+        --accent: #7aa2ff;
+        --accent-2: #65dfc9;
+        --border: #2b355d;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: radial-gradient(circle at top, #1a2550 0%, var(--bg) 55%);
+        color: var(--text);
+      }
+
+      .container {
+        width: min(1120px, calc(100% - 2rem));
+        margin: 0 auto;
+        padding: 2rem 0 3rem;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 1.25rem;
+        align-items: center;
+        background: linear-gradient(145deg, rgba(122, 162, 255, 0.15), rgba(101, 223, 201, 0.08));
+        border: 1px solid var(--border);
+        border-radius: 1rem;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .avatar {
+        width: 88px;
+        height: 88px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      .hero h1 {
+        font-size: clamp(1.4rem, 4vw, 2rem);
+      }
+
+      .hero p {
+        color: var(--muted);
+        margin-top: 0.4rem;
+      }
+
+      .stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.8rem;
+      }
+
+      .stat {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 0.25rem 0.7rem;
+        font-size: 0.85rem;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 0.9rem;
+      }
+
+      section {
+        margin-top: 1.25rem;
+      }
+
+      .section-title {
+        margin-bottom: 0.75rem;
+        font-size: 1.1rem;
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 0.8rem;
+        padding: 0.95rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.7rem;
+        min-height: 160px;
+      }
+
+      .repo-name {
+        font-weight: 650;
+        color: var(--text);
+        text-decoration: none;
+      }
+
+      .repo-desc {
+        color: var(--muted);
+        line-height: 1.4;
+        font-size: 0.92rem;
+        flex: 1;
+      }
+
+      .repo-meta,
+      .activity-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+
+      .pill {
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 0.2rem 0.55rem;
+        background: var(--surface-2);
+      }
+
+      .timeline {
+        display: grid;
+        gap: 0.65rem;
+      }
+
+      .event {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 0.7rem;
+        padding: 0.75rem 0.9rem;
+      }
+
+      .event-title {
+        font-size: 0.92rem;
+      }
+
+      .event-time {
+        color: var(--muted);
+        font-size: 0.8rem;
+        margin-top: 0.3rem;
+      }
+
+      .status {
+        color: var(--muted);
+      }
+
+      .error {
+        color: #ffb0b0;
+      }
+
+      footer {
+        margin-top: 2rem;
+        color: var(--muted);
+        font-size: 0.82rem;
+        text-align: center;
+      }
+
+      @media (max-width: 640px) {
+        .hero {
+          grid-template-columns: 1fr;
+          text-align: center;
+          justify-items: center;
+        }
+
+        .stats {
+          justify-content: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <article class="hero">
+        <img id="avatar" class="avatar" alt="GitHub avatar" />
+        <div>
+          <h1 id="name">Loading profile…</h1>
+          <p id="bio">Fetching GitHub profile details.</p>
+          <div class="stats" id="profile-stats"></div>
+        </div>
+      </article>
+
+      <section>
+        <h2 class="section-title">Featured Repositories</h2>
+        <div class="grid" id="featured-repos">
+          <p class="status">Loading repositories…</p>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="section-title">Recently Updated</h2>
+        <div class="grid" id="recent-repos">
+          <p class="status">Loading recently updated repositories…</p>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="section-title">Contribution Activity</h2>
+        <div class="grid" id="activity-summary">
+          <p class="status">Loading activity summary…</p>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="section-title">Recent Public Events</h2>
+        <div class="timeline" id="recent-events">
+          <p class="status">Loading recent events…</p>
+        </div>
+      </section>
+
+      <footer>
+        Powered by the GitHub public API • Auto-updates on page refresh
+      </footer>
+    </main>
+
+    <script>
+      const USERNAME = "michaelmworthington";
+
+      const refs = {
+        avatar: document.getElementById("avatar"),
+        name: document.getElementById("name"),
+        bio: document.getElementById("bio"),
+        profileStats: document.getElementById("profile-stats"),
+        featuredRepos: document.getElementById("featured-repos"),
+        recentRepos: document.getElementById("recent-repos"),
+        activitySummary: document.getElementById("activity-summary"),
+        recentEvents: document.getElementById("recent-events")
+      };
+
+      const eventTypeLabels = {
+        PushEvent: "Pushes",
+        PullRequestEvent: "Pull Requests",
+        IssuesEvent: "Issues",
+        IssueCommentEvent: "Issue Comments",
+        CreateEvent: "Creates",
+        WatchEvent: "Stars Given",
+        ForkEvent: "Forks"
+      };
+
+      function escapeHTML(text) {
+        return String(text ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
+      }
+
+      function formatDate(value) {
+        try {
+          return new Intl.DateTimeFormat(undefined, {
+            dateStyle: "medium",
+            timeStyle: "short"
+          }).format(new Date(value));
+        } catch {
+          return value;
+        }
+      }
+
+      function formatRelativeDate(value) {
+        const date = new Date(value);
+        const diffMs = Date.now() - date.getTime();
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+        if (diffDays <= 0) return "today";
+        if (diffDays === 1) return "1 day ago";
+        if (diffDays < 30) return `${diffDays} days ago`;
+        const diffMonths = Math.floor(diffDays / 30);
+        if (diffMonths === 1) return "1 month ago";
+        if (diffMonths < 12) return `${diffMonths} months ago`;
+        const diffYears = Math.floor(diffMonths / 12);
+        return diffYears === 1 ? "1 year ago" : `${diffYears} years ago`;
+      }
+
+      async function fetchJSON(url) {
+        const response = await fetch(url, {
+          headers: {
+            Accept: "application/vnd.github+json"
+          }
+        });
+
+        if (!response.ok) {
+          const details = await response.text();
+          throw new Error(`GitHub API error (${response.status}): ${details || "Unknown error"}`);
+        }
+
+        return response.json();
+      }
+
+      function renderRepoCards(target, repos, emptyMessage) {
+        if (!repos.length) {
+          target.innerHTML = `<p class="status">${escapeHTML(emptyMessage)}</p>`;
+          return;
+        }
+
+        target.innerHTML = repos
+          .map((repo) => {
+            const languagePill = repo.language
+              ? `<span class="pill">${escapeHTML(repo.language)}</span>`
+              : "";
+
+            return `
+              <article class="card">
+                <a class="repo-name" href="${escapeHTML(repo.html_url)}" target="_blank" rel="noreferrer">
+                  ${escapeHTML(repo.name)}
+                </a>
+                <p class="repo-desc">${escapeHTML(repo.description || "No description provided.")}</p>
+                <div class="repo-meta">
+                  <span class="pill">★ ${repo.stargazers_count}</span>
+                  <span class="pill">⑂ ${repo.forks_count}</span>
+                  ${languagePill}
+                  <span class="pill">Updated ${escapeHTML(formatRelativeDate(repo.updated_at))}</span>
+                </div>
+              </article>
+            `;
+          })
+          .join("");
+      }
+
+      function summarizeEvents(events) {
+        const counts = {};
+        for (const event of events) {
+          counts[event.type] = (counts[event.type] || 0) + 1;
+        }
+        return counts;
+      }
+
+      function renderActivitySummary(counts) {
+        const knownEntries = Object.entries(eventTypeLabels)
+          .map(([type, label]) => ({ label, count: counts[type] || 0 }))
+          .filter((entry) => entry.count > 0)
+          .sort((a, b) => b.count - a.count);
+
+        if (!knownEntries.length) {
+          refs.activitySummary.innerHTML = `<p class="status">No recent public events found.</p>`;
+          return;
+        }
+
+        refs.activitySummary.innerHTML = knownEntries
+          .map(
+            (entry) => `
+              <article class="card">
+                <h3>${escapeHTML(entry.label)}</h3>
+                <p class="repo-desc">${entry.count} recent public event${entry.count === 1 ? "" : "s"}</p>
+              </article>
+            `
+          )
+          .join("");
+      }
+
+      function describeEvent(event) {
+        const repo = event.repo?.name || "unknown repository";
+        const payload = event.payload || {};
+
+        if (event.type === "PushEvent") {
+          const commitCount = payload.commits?.length || 0;
+          return `Pushed ${commitCount} commit${commitCount === 1 ? "" : "s"} to ${repo}`;
+        }
+
+        if (event.type === "PullRequestEvent") {
+          const action = payload.action || "updated";
+          const prTitle = payload.pull_request?.title || "a pull request";
+          return `${action[0].toUpperCase() + action.slice(1)} ${prTitle} in ${repo}`;
+        }
+
+        if (event.type === "IssuesEvent") {
+          const action = payload.action || "updated";
+          const issueTitle = payload.issue?.title || "an issue";
+          return `${action[0].toUpperCase() + action.slice(1)} ${issueTitle} in ${repo}`;
+        }
+
+        if (event.type === "IssueCommentEvent") {
+          const action = payload.action || "commented on";
+          return `${action[0].toUpperCase() + action.slice(1)} an issue in ${repo}`;
+        }
+
+        if (event.type === "WatchEvent") {
+          return `Starred ${repo}`;
+        }
+
+        if (event.type === "ForkEvent") {
+          return `Forked ${repo}`;
+        }
+
+        if (event.type === "CreateEvent") {
+          const refType = payload.ref_type || "resource";
+          const refName = payload.ref ? ` "${payload.ref}"` : "";
+          return `Created ${refType}${refName} in ${repo}`;
+        }
+
+        return `${event.type.replace(/Event$/, "")} in ${repo}`;
+      }
+
+      function renderEvents(events) {
+        if (!events.length) {
+          refs.recentEvents.innerHTML = `<p class="status">No recent public events found.</p>`;
+          return;
+        }
+
+        refs.recentEvents.innerHTML = events
+          .slice(0, 12)
+          .map(
+            (event) => `
+              <article class="event">
+                <p class="event-title">${escapeHTML(describeEvent(event))}</p>
+                <p class="event-time">${escapeHTML(formatDate(event.created_at))}</p>
+              </article>
+            `
+          )
+          .join("");
+      }
+
+      async function initialize() {
+        const profileUrl = `https://api.github.com/users/${USERNAME}`;
+        const reposUrl = `https://api.github.com/users/${USERNAME}/repos?type=owner&sort=updated&per_page=100`;
+        const eventsUrl = `https://api.github.com/users/${USERNAME}/events/public?per_page=100`;
+
+        const [profileResult, reposResult, eventsResult] = await Promise.allSettled([
+          fetchJSON(profileUrl),
+          fetchJSON(reposUrl),
+          fetchJSON(eventsUrl)
+        ]);
+
+        if (profileResult.status === "fulfilled") {
+          const profile = profileResult.value;
+          refs.avatar.src = profile.avatar_url;
+          refs.avatar.alt = `${profile.login} avatar`;
+          refs.name.textContent = profile.name || profile.login;
+          refs.bio.textContent = profile.bio || "Builder of software and open source projects.";
+          refs.profileStats.innerHTML = `
+            <span class="stat">@${escapeHTML(profile.login)}</span>
+            <span class="stat">${profile.public_repos} public repos</span>
+            <span class="stat">${profile.followers} followers</span>
+            <span class="stat">${profile.following} following</span>
+            <span class="stat"><a href="${escapeHTML(profile.html_url)}" target="_blank" rel="noreferrer" style="color:inherit;text-decoration:none;">View GitHub profile ↗</a></span>
+          `;
+        } else {
+          refs.name.textContent = "Unable to load profile";
+          refs.bio.textContent = "The GitHub profile could not be loaded right now.";
+          refs.profileStats.innerHTML = `<span class="stat error">Check API rate limits and try again.</span>`;
+        }
+
+        if (reposResult.status === "fulfilled") {
+          const repos = reposResult.value.filter((repo) => !repo.private);
+          const featured = [...repos]
+            .sort((a, b) => b.stargazers_count - a.stargazers_count || b.forks_count - a.forks_count)
+            .slice(0, 6);
+          const recent = [...repos].sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)).slice(0, 6);
+          renderRepoCards(refs.featuredRepos, featured, "No repositories found.");
+          renderRepoCards(refs.recentRepos, recent, "No repositories found.");
+        } else {
+          refs.featuredRepos.innerHTML = `<p class="status error">Unable to load repositories from GitHub.</p>`;
+          refs.recentRepos.innerHTML = `<p class="status error">Unable to load repositories from GitHub.</p>`;
+        }
+
+        if (eventsResult.status === "fulfilled") {
+          const events = eventsResult.value;
+          renderActivitySummary(summarizeEvents(events));
+          renderEvents(events);
+        } else {
+          refs.activitySummary.innerHTML = `<p class="status error">Unable to load activity summary.</p>`;
+          refs.recentEvents.innerHTML = `<p class="status error">Unable to load recent events.</p>`;
+        }
+      }
+
+      initialize().catch((error) => {
+        refs.featuredRepos.innerHTML = `<p class="status error">${escapeHTML(error.message)}</p>`;
+        refs.recentRepos.innerHTML = `<p class="status error">Page initialization failed.</p>`;
+        refs.activitySummary.innerHTML = `<p class="status error">Page initialization failed.</p>`;
+        refs.recentEvents.innerHTML = `<p class="status error">Page initialization failed.</p>`;
+      });
+    </script>
+  </body>
+</html>
