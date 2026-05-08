@@ -11,7 +11,7 @@ Personal GitHub Pages portfolio site for **michaelmworthington**.
 
 ## Local preview
 
-Open `/home/runner/work/michaelmworthington.github.io/michaelmworthington.github.io/index.html` in a browser.
+Clone the repo and open `index.html` in your browser.
 
 ## GitHub Pages
 
